@@ -40,7 +40,9 @@ def pass_globals(f):
 for k in sorted(PLUGINS, key=lambda k: k[1]):
     if hasattr(PLUGINS[k], 'handlers'):
         for h in PLUGINS[k].handlers:
-            h = list(h)
+            if not isinstance(h, list):
+                h = [h]
+                
             if any(a.name in passable for a in signature(h[0]).parameters):
                 h[0] = pass_globals(h[0])
 
