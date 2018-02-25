@@ -2,9 +2,9 @@ import functools
 import json
 import logging
 import os
-import re
 from importlib import import_module
 from inspect import signature
+from re import match
 
 from telegram.ext import Updater
 
@@ -21,7 +21,7 @@ for directory in (s for s in os.listdir('plugins') if os.path.isdir('plugins/' +
     for fn in (s[:-3] for s in os.listdir('plugins/' + directory) if s.endswith('.py')):
         plugin = import_module('plugins.{}.{}'.format(directory, fn))
 
-        name = re.match(r'plugin:([\w\s]+)', plugin.__doc__)
+        name = match(r'plugin:([\w\s]+)', plugin.__doc__)
         if name:
             PLUGINS[(name.group(1), plugin.order if hasattr(plugin, 'order') else 0)] = plugin
 
