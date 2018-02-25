@@ -10,7 +10,7 @@ order = -1
 handlers = []
 
 
-# May include tokens, plugins or logger arguments to be passed from the bot if needed.
+# May include plugins and/or logger arguments to be passed from the bot if needed.
 def command(bot, update):
     update.message.chat.send_action(Ca.TYPING)
     update.message.reply_text(text="Template plugin reply.")
