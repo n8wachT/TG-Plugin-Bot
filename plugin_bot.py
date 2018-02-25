@@ -43,9 +43,15 @@ for k in sorted(PLUGINS, key=lambda k: k[1]):
         for h in PLUGINS[k].handlers:
             if not isinstance(h, list):
                 h = [h]
+<<<<<<< HEAD
 
             if any(a in passable for a in signature(h[0].callback).parameters):
                 h[0].callback = pass_globals(h[0].callback)
+=======
+                
+            if any(a.name in passable for a in signature(h[0]).parameters):
+                h[0] = pass_globals(h[0])
+>>>>>>> d92336fc08cc9e5f0be8fe3d1ee9adbca5455c6d
 
             updater.dispatcher.add_handler(*h)
 
