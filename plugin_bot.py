@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 passable = {'plugins': 'PLUGINS', 'logger': 'logger'}
 
+# Find plugins in their directories and add them to the PLUGINS dictionary with (name, order) tuples as keys.
 for directory in (s for s in os.listdir('plugins') if os.path.isdir('plugins/' + s)):
     for fn in (s[:-3] for s in os.listdir('plugins/' + directory) if s.endswith('.py')):
         plugin = import_module('plugins.{}.{}'.format(directory, fn))
@@ -38,12 +39,14 @@ def pass_globals(f):
     return wrapper
 
 
+# Load plugins in specified order.
 for k in sorted(PLUGINS, key=lambda k: k[1]):
     if hasattr(PLUGINS[k], 'handlers'):
         for h in PLUGINS[k].handlers:
             if not isinstance(h, list):
                 h = [h]
 
+            # Wrap callback function with globals if required.
             if any(a in passable for a in signature(h[0].callback).parameters):
                 h[0].callback = pass_globals(h[0].callback)
 
@@ -52,7 +55,7 @@ for k in sorted(PLUGINS, key=lambda k: k[1]):
     logger.info('loaded plugin "{}"'.format(k[0]))
 
 
-def err(update, error):
+def err(bot, update, error):
     logger.error('update "{}" caused error "{}"'.format(update, error))
 
 
