@@ -1,4 +1,5 @@
 import functools
+import json
 import logging
 import os
 import re
@@ -29,8 +30,8 @@ def pass_globals(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         for a in signature(f).parameters:
-            if a.name in passable:
-                kwargs[a.name] = globals()[passable[a.name]]
+            if a in passable:
+                kwargs[a] = globals()[passable[a]]
 
         return f(*args, **kwargs)
 
@@ -40,9 +41,11 @@ def pass_globals(f):
 for k in sorted(PLUGINS, key=lambda k: k[1]):
     if hasattr(PLUGINS[k], 'handlers'):
         for h in PLUGINS[k].handlers:
-            h = list(h)
-            if any(a.name in passable for a in signature(h[0]).parameters):
-                h[0] = pass_globals(h[0])
+            if not isinstance(h, list):
+                h = [h]
+
+            if any(a in passable for a in signature(h[0].callback).parameters):
+                h[0].callback = pass_globals(h[0].callback)
 
             updater.dispatcher.add_handler(*h)
 
