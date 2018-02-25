@@ -9,13 +9,12 @@ from inspect import signature
 from telegram.ext import Updater
 
 PLUGINS = {}
+PASSABLE = {'plugins': 'PLUGINS', 'logger': 'logger'}
 
 updater = Updater(token="PLACEHOLDER")
 
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-passable = {'plugins': 'PLUGINS', 'logger': 'logger'}
 
 # Find plugins in their directories and add them to the PLUGINS dictionary with (name, order) tuples as keys.
 for directory in (s for s in os.listdir('plugins') if os.path.isdir('plugins/' + s)):
@@ -31,8 +30,8 @@ def pass_globals(f):
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         for a in signature(f).parameters:
-            if a in passable:
-                kwargs[a] = globals()[passable[a]]
+            if a in PASSABLE:
+                kwargs[a] = globals()[PASSABLE[a]]
 
         return f(*args, **kwargs)
 
@@ -47,7 +46,7 @@ for k in sorted(PLUGINS, key=lambda k: k[1]):
                 h = [h]
 
             # Wrap callback function with globals if required.
-            if any(a in passable for a in signature(h[0].callback).parameters):
+            if any(a in PASSABLE for a in signature(h[0].callback).parameters):
                 h[0].callback = pass_globals(h[0].callback)
 
             updater.dispatcher.add_handler(*h)
