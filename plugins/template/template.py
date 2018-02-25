@@ -1,5 +1,5 @@
 """plugin:plugin template"""
-# docstring must be of the format """plugin:<plugin name>""" or plugin will be ignored.
+# Docstring must be of the format """plugin:<plugin name>""" or plugin will be ignored.
 from telegram import ChatAction as Ca
 from telegram.ext import CommandHandler
 
