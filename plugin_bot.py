@@ -1,6 +1,6 @@
-import functools
 import logging
 import os
+from functools import wraps
 from importlib import import_module
 from inspect import signature
 from re import match
