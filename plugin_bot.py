@@ -15,14 +15,14 @@ updater = Updater(token="PLACEHOLDER")
 logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Find plugins in their directories and add them to the PLUGINS dictionary with (name, order) tuples as keys.
+# Find plugins in their directories and add them to the PLUGINS dictionary.
 for directory in (s for s in os.listdir('plugins') if os.path.isdir('plugins/' + s)):
     for fn in (s[:-3] for s in os.listdir('plugins/' + directory) if s.endswith('.py')):
         plugin = import_module('plugins.{}.{}'.format(directory, fn))
 
         name = match(r'plugin:([\w\s]+)', plugin.__doc__ or '')
         if name:
-            PLUGINS[(name.group(1), plugin.order if hasattr(plugin, 'order') else 0)] = plugin
+            PLUGINS[name.group(1)] = plugin
 
 
 def pass_globals(f):
@@ -38,7 +38,7 @@ def pass_globals(f):
 
 
 # Load plugins in specified order.
-for k in sorted(PLUGINS, key=lambda k: k[1]):
+for k in sorted(PLUGINS, key=lambda k: PLUGINS[k].order if hasattr(PLUGINS[k], 'order') else 0):
     if hasattr(PLUGINS[k], 'handlers'):
         for h in PLUGINS[k].handlers:
             if not isinstance(h, list):
