@@ -8,7 +8,8 @@ from re import match
 from telegram.ext import Updater
 
 PLUGINS = {}
-PASSABLE = {'plugins': 'PLUGINS', 'logger': 'logger'}
+PASSABLE = {'plugins': lambda: PLUGINS,
+            'logger': lambda: logger}
 
 updater = Updater(token="PLACEHOLDER")
 
@@ -26,13 +27,10 @@ for directory in (s for s in os.listdir('plugins') if os.path.isdir('plugins/' +
 
 
 def pass_globals(f):
-    @functools.wraps(f)
+    @wraps(f)
     def wrapper(*args, **kwargs):
-        for a in signature(f).parameters:
-            if a in PASSABLE:
-                kwargs[a] = globals()[PASSABLE[a]]
-
-        return f(*args, **kwargs)
+        sig = signature(f).parameters
+        return f(*args, **{k: v() for k, v in PASSABLE.items() if k in sig}, **kwargs)
 
     return wrapper
 
