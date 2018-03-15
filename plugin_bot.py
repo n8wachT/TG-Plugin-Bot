@@ -9,7 +9,7 @@ from telegram.ext import Updater
 
 PLUGINS = {}
 PASSABLE = {'plugins': lambda: PLUGINS,
-            'logger': lambda: logger}
+            'logger':  lambda: logger}
 
 updater = Updater(token="PLACEHOLDER")
 
